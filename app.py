@@ -8,33 +8,50 @@ from urllib.request import urlopen
 import json
 from copy import deepcopy
 
+# First some MPG Data Exploration
+# mpg_df = pd.read_csv("./data/mpg.csv")
+
+
+# Problem, takes a lot of memoy => in cache
+# but should not touch original data => raw
+# tehn copy raw and put it df
+
 @st.cache_data
 def load_data(path):
     df = pd.read_csv(path)
     return df
 
-# First some MPG Data Exploration
-mpg_df_raw = load_data("./data/mpg.csv")
+mpg_df_raw = load_data("./data/mpg.csv")  # for speed
+mpg_df = deepcopy(mpg_df_raw) # for security
 
 
 # Add title and header
 st.title("Introduction to Streamlit")
 st.header("MPG Data Exploration")
 
-#st.table(data=mpg_df)
+test = st.checkbox('test')
+'test: ', test    # check to show what's going on
+
 if st.checkbox("Show Dataframe"):
 
-    st.subheader("This is my dataset:")
-    st.dataframe(data=mpg_df)
+    st.subheader("This is my dataset:")   
+    # st.table(data=mpg_df)   UGLY
+    st.dataframe(data=mpg_df)  # prettier
+
+
+# if you want to put somthing on teh side: sue if st.sidebar () 
 
 #left_column, right_column = st.columns(2)
-left_column, middle_column, right_column = st.columns([3, 1, 1])  
+left_column, middle_column, right_column = st.columns([3, 1, 1]) # allows so specify the width of the columns
 
+# make a dropdown menu to update plots
 years = ["All"]+sorted(pd.unique(mpg_df['year']))
-year = left_column.selectbox("Choose a Year", years)
+year = left_column.selectbox("Choose a Year", years)   # dropdown . by specfyng teh left column instead of st.selectbox, we put it on teh left
 
 show_means = middle_column.radio(
-    label='Show Class Means', options=['Yes', 'No'])
+    label='Show Class Means', options=['Yes', 'No'])  # this is a radio button
+
+# so basically, st. is the base placement
 
 plot_types = ["Matplotlib", "Plotly"]
 plot_type = right_column.radio("Choose Plot Type", plot_types)
@@ -58,9 +75,7 @@ if show_means == "Yes":
     ax.scatter(means['displ'], means['hwy'], alpha=0.7,
                color="red", label="Class Means")
 
-
-
-# st.pyplot(m_fig)
+#st.pyplot(m_fig)
 
 # In Plotly
 p_fig = px.scatter(reduced_df, x='displ', y='hwy', opacity=0.5,
@@ -76,22 +91,12 @@ if show_means == "Yes":
                                mode="markers"))
     p_fig.update_layout(showlegend=False)
 
-# st.plotly_chart(p_fig)
-
+#st.plotly_chart(p_fig)
 
 if plot_type == "Matplotlib":
     st.pyplot(m_fig)
 else:
     st.plotly_chart(p_fig)
-
-
-
-
-
-
-
-
-
 
 # We can write stuff
 url = "https://archive.ics.uci.edu/ml/datasets/auto+mpg"
@@ -104,11 +109,14 @@ ds_geo = px.data.carshare()
 
 
 
-ds_geo['lat'] = ds_geo['centroid_lat'] 
+ds_geo['lat'] = ds_geo['centroid_lat'] # streamlist automatically knows what to do with lat and lon
 ds_geo['lon'] = ds_geo['centroid_lon']
 
-st.dataframe(ds_geo.head())
+
 
 st.map(ds_geo)
 
 st.dataframe(ds_geo.head())
+
+
+
