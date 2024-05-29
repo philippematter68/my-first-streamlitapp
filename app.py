@@ -126,4 +126,4 @@ st.dataframe(ds_geo.head())
 st.image('./data/dolphin_trumpet.jpg',)
 
 # Clear values from *all* in-memory or on-disk cached functions
-st.cache_data.clear()
+# st.cache_data.clear()
